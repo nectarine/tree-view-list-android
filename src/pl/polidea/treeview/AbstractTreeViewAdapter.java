@@ -163,12 +163,17 @@ public abstract class AbstractTreeViewAdapter<T> extends BaseAdapter implements
         Log.d(TAG, "Creating a view based on " + convertView
                 + " with position " + position);
         final TreeNodeInfo<T> nodeInfo = getTreeNodeInfo(position);
+
+        Log.d(TAG, "Creating the view a new");
+        final LinearLayout layout = (LinearLayout) layoutInflater.inflate(
+                getTreeListItemWrapperId(), null);
+        return populateTreeItem(layout, getNewChildView(nodeInfo),
+                nodeInfo, true);
+
+        /*
+        current reusing is not working
+
         if (convertView == null) {
-            Log.d(TAG, "Creating the view a new");
-            final LinearLayout layout = (LinearLayout) layoutInflater.inflate(
-                    getTreeListItemWrapperId(), null);
-            return populateTreeItem(layout, getNewChildView(nodeInfo),
-                    nodeInfo, true);
         } else {
             Log.d(TAG, "Reusing the view");
             final LinearLayout linear = (LinearLayout) convertView;
@@ -178,6 +183,7 @@ public abstract class AbstractTreeViewAdapter<T> extends BaseAdapter implements
             updateView(childView, nodeInfo);
             return populateTreeItem(linear, childView, nodeInfo, false);
         }
+        */
     }
 
     /**
