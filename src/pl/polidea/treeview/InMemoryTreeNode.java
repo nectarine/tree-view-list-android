@@ -16,16 +16,18 @@ class InMemoryTreeNode<T> implements Serializable {
     private final T parent;
     private final int level;
     private boolean visible = true;
+    private boolean expand = false;
     private final List<InMemoryTreeNode<T>> children = new LinkedList<InMemoryTreeNode<T>>();
     private List<T> childIdListCache = null;
 
     public InMemoryTreeNode(final T id, final T parent, final int level,
-            final boolean visible) {
+            final boolean visible, final boolean expand) {
         super();
         this.id = id;
         this.parent = parent;
         this.level = level;
         this.visible = visible;
+        this.expand = expand;
     }
 
     public int indexOf(final T id) {
@@ -65,7 +67,7 @@ class InMemoryTreeNode<T> implements Serializable {
         childIdListCache = null;
         // Note! top levell children are always visible (!)
         final InMemoryTreeNode<T> newNode = new InMemoryTreeNode<T>(child,
-                getId(), getLevel() + 1, getId() == null ? true : visible);
+                getId(), getLevel() + 1, getId() == null ? true : visible, false);
         children.add(index, newNode);
         return newNode;
     }
@@ -113,4 +115,11 @@ class InMemoryTreeNode<T> implements Serializable {
         return level;
     }
 
+    boolean isExpand() {
+        return expand;
+    }
+
+    void setExpand(boolean expand) {
+        this.expand = expand;
+    }
 }

@@ -9,25 +9,20 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.ViewGroup;
-import android.widget.BaseAdapter;
-import android.widget.FrameLayout;
+import android.widget.*;
 import android.widget.FrameLayout.LayoutParams;
-import android.widget.ImageView;
 import android.widget.ImageView.ScaleType;
-import android.widget.LinearLayout;
-import android.widget.ListAdapter;
 
 /**
  * Adapter used to feed the table view.
- * 
- * @param <T>
- *            class for ID of the tree
+ *
+ * @param <T> class for ID of the tree
  */
 public abstract class AbstractTreeViewAdapter<T> extends BaseAdapter implements
         ListAdapter {
     private static final String TAG = AbstractTreeViewAdapter.class
             .getSimpleName();
-    private final TreeStateManager<T> treeStateManager;
+    protected final TreeStateManager<T> treeStateManager;
     private final int numberOfLevels;
     private final LayoutInflater layoutInflater;
 
@@ -71,6 +66,7 @@ public abstract class AbstractTreeViewAdapter<T> extends BaseAdapter implements
         }
     }
 
+
     private void calculateIndentWidth() {
         if (expandedDrawable != null) {
             indentWidth = Math.max(getIndentWidth(),
@@ -83,7 +79,7 @@ public abstract class AbstractTreeViewAdapter<T> extends BaseAdapter implements
     }
 
     public AbstractTreeViewAdapter(final Activity activity,
-            final TreeStateManager<T> treeStateManager, final int numberOfLevels) {
+                                   final TreeStateManager<T> treeStateManager, final int numberOfLevels) {
         this.activity = activity;
         this.treeStateManager = treeStateManager;
         this.layoutInflater = (LayoutInflater) activity
@@ -159,7 +155,7 @@ public abstract class AbstractTreeViewAdapter<T> extends BaseAdapter implements
 
     @Override
     public final View getView(final int position, final View convertView,
-            final ViewGroup parent) {
+                              final ViewGroup parent) {
         Log.d(TAG, "Creating a view based on " + convertView
                 + " with position " + position);
         final TreeNodeInfo<T> nodeInfo = getTreeNodeInfo(position);
@@ -188,9 +184,8 @@ public abstract class AbstractTreeViewAdapter<T> extends BaseAdapter implements
 
     /**
      * Called when new view is to be created.
-     * 
-     * @param treeNodeInfo
-     *            node info
+     *
+     * @param treeNodeInfo node info
      * @return view that should be displayed as tree content
      */
     public abstract View getNewChildView(TreeNodeInfo<T> treeNodeInfo);
@@ -200,22 +195,19 @@ public abstract class AbstractTreeViewAdapter<T> extends BaseAdapter implements
      * and fill it in with the data required to display the new information. You
      * can also create a new view, which will mean that the old view will not be
      * reused.
-     * 
-     * @param view
-     *            view that should be updated with the new values
-     * @param treeNodeInfo
-     *            node info used to populate the view
+     *
+     * @param view         view that should be updated with the new values
+     * @param treeNodeInfo node info used to populate the view
      * @return view to used as row indented content
      */
     public abstract View updateView(View view, TreeNodeInfo<T> treeNodeInfo);
 
     /**
      * Retrieves background drawable for the node.
-     * 
-     * @param treeNodeInfo
-     *            node info
+     *
+     * @param treeNodeInfo node info
      * @return drawable returned as background for the whole row. Might be null,
-     *         then default background is used
+     * then default background is used
      */
     public Drawable getBackgroundDrawable(final TreeNodeInfo<T> treeNodeInfo) { // NOPMD
         return null;
@@ -231,8 +223,8 @@ public abstract class AbstractTreeViewAdapter<T> extends BaseAdapter implements
     }
 
     public final LinearLayout populateTreeItem(final LinearLayout layout,
-            final View childView, final TreeNodeInfo<T> nodeInfo,
-            final boolean newChildView) {
+                                               final View childView, final TreeNodeInfo<T> nodeInfo,
+                                               final boolean newChildView) {
         final Drawable individualRowDrawable = getBackgroundDrawable(nodeInfo);
         layout.setBackgroundDrawable(individualRowDrawable == null ? getDrawableOrDefaultBackground(rowBackgroundDrawable)
                 : individualRowDrawable);
@@ -324,5 +316,4 @@ public abstract class AbstractTreeViewAdapter<T> extends BaseAdapter implements
     public void handleItemClick(final View view, final Object id) {
         expandCollapse((T) id);
     }
-
 }

@@ -1,9 +1,9 @@
 package pl.polidea.treeview;
 
+import android.database.DataSetObserver;
+
 import java.io.Serializable;
 import java.util.List;
-
-import android.database.DataSetObserver;
 
 /**
  * Manages information about state of the tree. It only keeps information about
@@ -105,6 +105,14 @@ public interface TreeStateManager<T> extends Serializable {
     void expandDirectChildren(T id);
 
     /**
+     * Expands all children which already opened before
+     * @param id
+     *            node which children should be expanded. cannot be null
+     */
+
+    void expandChildrenWithPreviousState(T id);
+
+    /**
      * Expands everything below the node specified. Might be null - then expands
      * all.
      * 
@@ -163,6 +171,8 @@ public interface TreeStateManager<T> extends Serializable {
      * @return return the list of all visible nodes in the right sequence
      */
     List<T> getVisibleList();
+
+    List<T> getExpandedNodeList();
 
     /**
      * Registers observers with the manager.

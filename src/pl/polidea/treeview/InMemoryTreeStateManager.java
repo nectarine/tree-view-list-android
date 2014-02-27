@@ -1,16 +1,9 @@
 package pl.polidea.treeview;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-
 import android.database.DataSetObserver;
 import android.util.Log;
+
+import java.util.*;
 
 /**
  * In-memory manager of tree state.
@@ -24,7 +17,7 @@ public class InMemoryTreeStateManager<T> implements TreeStateManager<T> {
     private static final long serialVersionUID = 1L;
     private final Map<T, InMemoryTreeNode<T>> allNodes = new HashMap<T, InMemoryTreeNode<T>>();
     private final InMemoryTreeNode<T> topSentinel = new InMemoryTreeNode<T>(
-            null, null, -1, true);
+            null, null, -1, true, false);
     private transient List<T> visibleListCache = null; // lasy initialised
     private transient List<T> unmodifiableVisibleList = null;
     private boolean visibleByDefault = true;
@@ -190,11 +183,30 @@ public class InMemoryTreeStateManager<T> implements TreeStateManager<T> {
         }
     }
 
+    private void expandAllChildrenWithPreviousState(final InMemoryTreeNode<T> node) {
+        for (final InMemoryTreeNode<T> child : node.getChildren()) {
+            child.setVisible(true);
+            if (child.isExpand()) {
+                expandAllChildrenWithPreviousState(child);
+            }
+        }
+    }
+
     @Override
     public synchronized void expandDirectChildren(final T id) {
         Log.d(TAG, "Expanding direct children of " + id);
         final InMemoryTreeNode<T> node = getNodeFromTreeOrThrowAllowRoot(id);
+        node.setExpand(true);
         setChildrenVisibility(node, true, false);
+        internalDataSetChanged();
+    }
+
+    @Override
+    public void expandChildrenWithPreviousState(T id) {
+        Log.d(TAG, "Expand child with previous state below " + id);
+        final InMemoryTreeNode<T> node = getNodeFromTreeOrThrowAllowRoot(id);
+        node.setExpand(true);
+        expandAllChildrenWithPreviousState(node);
         internalDataSetChanged();
     }
 
@@ -209,6 +221,7 @@ public class InMemoryTreeStateManager<T> implements TreeStateManager<T> {
     @Override
     public synchronized void collapseChildren(final T id) {
         final InMemoryTreeNode<T> node = getNodeFromTreeOrThrowAllowRoot(id);
+        node.setExpand(false);
         if (node == topSentinel) {
             for (final InMemoryTreeNode<T> n : topSentinel.getChildren()) {
                 setChildrenVisibility(n, false, true);
@@ -277,6 +290,17 @@ public class InMemoryTreeStateManager<T> implements TreeStateManager<T> {
                     .unmodifiableList(visibleListCache);
         }
         return unmodifiableVisibleList;
+    }
+
+    @Override
+    public List<T> getExpandedNodeList() {
+        List<T> expandList = new ArrayList<>();
+        for (Map.Entry<T, InMemoryTreeNode<T>> entry : allNodes.entrySet()) {
+            if (entry.getValue().isExpand()) {
+                expandList.add(entry.getKey());
+            }
+        }
+        return expandList;
     }
 
     public synchronized T getNextVisible(final T id) {
